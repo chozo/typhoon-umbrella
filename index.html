@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+    <meta name="theme-color" content="#101a2d" />
+    <title>傘、絶対に壊すな。</title>
+    <link rel="icon" href="favicon.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <main class="game-shell" aria-label="台風の帰宅ゲーム">
+      <canvas id="game" width="405" height="720"></canvas>
+      <section id="start" class="screen start-screen">
+        <p class="eyebrow">THPHOON UMBRELLA</p>
+        <h1>傘、絶対に<br />壊すな。</h1>
+        <p class="lead">暴風雨のなか、30秒で帰宅せよ。</p>
+        <div class="howto"><span class="finger">☝</span><span>画面を左右にドラッグして<br />風に合わせて傘を傾ける</span></div>
+        <button id="startButton">帰る</button>
+      </section>
+      <section id="result" class="screen result-screen hidden" aria-live="polite">
+        <p id="resultKicker" class="eyebrow">HOME SWEET HOME</p>
+        <div id="clearArt" class="clear-art hidden" aria-hidden="true"><img src="soaked-character.png" alt="" /></div>
+        <div id="brokenArt" class="broken-art hidden" aria-hidden="true"><img src="broken-umbrella.png" alt="" /></div>
+        <h2 id="resultTitle">帰宅！</h2>
+        <p id="resultMessage" class="result-message"></p>
+        <button id="retryButton">RETRY</button>
+        <button id="homeButton" class="home-link">スタート画面に戻る</button>
+      </section>
+      <div id="hud" class="hud hidden">
+        <div class="topbar"><div class="wind"><span>風</span><b id="windArrow">→→</b></div><div class="durability"><span>傘の耐久度</span><div class="durability-track"><i id="durabilityBar"></i></div><b id="durabilityValue">100%</b></div><div id="timer">30.0</div></div>
+        <p id="hint" class="hint">風上へ傘を傾けろ！</p>
+      </div>
+    </main>
+    <script src="game.js"></script>
+  </body>
+</html>

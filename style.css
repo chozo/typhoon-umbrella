@@ -1,0 +1,30 @@
+@import url('https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@500;700;900&display=swap');
+
+:root { color-scheme: dark; }
+* { box-sizing: border-box; }
+html, body { height: 100%; margin: 0; overflow: hidden; background: #070c16; font-family: "Zen Kaku Gothic New", system-ui, sans-serif; }
+body { display: grid; place-items: center; }
+.game-shell { width: min(100vw, calc(100dvh * 9 / 16), 430px); aspect-ratio: 9 / 16; height: auto; position: relative; overflow: hidden; background: #101a2d; box-shadow: 0 18px 60px #000b; }
+canvas { width: 100%; height: 100%; display: block; touch-action: none; }
+.screen { position: absolute; inset: 0; display: flex; align-items: center; flex-direction: column; text-align: center; padding: 12vh 28px 34px; background: linear-gradient(#0a1224b8, #0b142ae8); transition: opacity .25s, transform .25s; }
+.hidden { opacity: 0; pointer-events: none; transform: scale(1.03); }
+.start-screen { justify-content: flex-start; }
+.eyebrow { color: #a9d7ff; font-size: 11px; font-weight: 900; letter-spacing: .2em; margin: 0 0 12px; }
+h1 { margin: 0; font-size: clamp(40px, 12vw, 52px); line-height: 1.15; letter-spacing: -.08em; text-shadow: 0 4px 0 #111d36; }
+.lead { color: #d4e8fb; font-size: 14px; margin: 20px 0 34px; }
+.howto { display: flex; gap: 12px; text-align: left; align-items: center; color: #dcecff; font-size: 13px; font-weight: 700; background: #253b5ba8; border: 1px solid #7296bb77; padding: 13px 15px; border-radius: 12px; }
+.finger { font-size: 27px; filter: grayscale(1); }
+button { margin-top: 32px; min-width: 195px; border: 0; border-radius: 99px; color: #10213a; background: #e9f5ff; padding: 15px 24px; font: 900 18px inherit; box-shadow: 0 5px 0 #86a8c6, 0 12px 28px #0007; cursor: pointer; }
+button:active { transform: translateY(4px); box-shadow: 0 1px 0 #86a8c6; }
+.hud { position: absolute; inset: 0; pointer-events: none; padding: 15px; transition: opacity .2s; }
+.topbar { display: flex; justify-content: space-between; align-items: start; font-weight: 900; text-shadow: 0 2px 3px #000; }
+.wind { font-size: 12px; display: flex; flex-direction: column; gap: 1px; color: #c6e8ff; }.wind b { color: white; font-size: 19px; letter-spacing: -3px; }
+.durability { width: 106px; text-align: left; color: #d9e9f7; font-size: 9px; line-height: 1.1; }.durability b { display: block; margin-top: 2px; font-size: 11px; text-align: right; }.durability-track { height: 7px; overflow: hidden; border-radius: 99px; margin-top: 3px; background: #101827aa; border: 1px solid #c5e5f077; }.durability-track i { display: block; width: 100%; height: 100%; background: linear-gradient(90deg, #fa5c57, #ffdc67 45%, #63e6a2); transition: width .12s; }
+#timer { font-size: 30px; line-height: 1; }
+.hint { position: absolute; bottom: 25px; left: 0; right: 0; margin: 0; font-size: 12px; font-weight: 900; text-shadow: 0 2px 3px #000; animation: pulse 1s infinite alternate; }
+.result-screen { justify-content: center; padding-top: 0; }.result-screen h2 { font-size: 37px; letter-spacing: -.08em; margin: 0 0 10px; }.result-message { min-height: 1.5em; color: #d9eeff; font-weight: 700; font-size: 14px; margin: 7px 0 0; white-space: pre-line; }.home-link { min-width: auto; margin-top: 14px; padding: 0; color: #c6e8ff; background: transparent; border-radius: 0; box-shadow: none; font-size: 12px; text-decoration: underline; }.home-link:active { box-shadow: none; transform: none; }
+.broken-art { width: 154px; height: 138px; margin: -16px 0 3px; display: grid; place-items: center; }.broken-art img { display: block; width: 100%; height: 100%; object-fit: contain; filter: drop-shadow(0 7px 8px #0008); }
+.clear-art { width: 126px; height: 142px; margin: -13px 0 2px; display: grid; place-items: center; }.clear-art img { display: block; width: 100%; height: 100%; object-fit: contain; filter: drop-shadow(0 7px 8px #0008); }
+.result-screen.is-clear .eyebrow, .result-screen.is-clear .clear-art { transform: translateY(12px); }
+@keyframes pulse { to { opacity:.45; transform: translateY(2px); } }
+@media (min-width: 440px) { .game-shell { border-radius: 22px; } }
