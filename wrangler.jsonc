@@ -1,0 +1,12 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "typhoon-umbrella",
+  "compatibility_date": "2026-09-20",
+  "workers_dev": false,
+  "observability": { "enabled": true, "head_sampling_rate": 1 },
+  "assets": { "directory": "./dist" },
+  "routes": [
+    { "pattern": "game.chozo.net/typhoon-umbrella", "zone_name": "chozo.net" },
+    { "pattern": "game.chozo.net/typhoon-umbrella/*", "zone_name": "chozo.net" }
+  ]
+}

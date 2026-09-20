@@ -1,0 +1,12 @@
+{
+  "name": "typhoon-umbrella",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "build": "node tools/build-dist.mjs",
+    "deploy": "npm run build && wrangler deploy"
+  },
+  "devDependencies": {
+    "wrangler": "^4.135.0"
+  }
+}
