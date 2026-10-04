@@ -15,11 +15,14 @@ function playBreakSound() { const audio=effectAudio();if(!audio)return;const now
 function playClearSound() { const audio=effectAudio();if(!audio)return;const now=audio.currentTime;[[1318.5,0,.28,.1],[1046.5,.4,1.45,.13]].forEach(([frequency,delay,length,volume],index)=>{const osc=audio.createOscillator(), gain=audio.createGain();osc.type='sine';osc.frequency.value=frequency;if(index)osc.frequency.exponentialRampToValueAtTime(990,now+delay+length);gain.gain.setValueAtTime(.001,now+delay);gain.gain.exponentialRampToValueAtTime(volume,now+delay+.025);gain.gain.exponentialRampToValueAtTime(.001,now+delay+length);osc.connect(gain).connect(audio.destination);osc.start(now+delay);osc.stop(now+delay+length+.02);}); }
 function startSound() {
   if (!window.AudioContext && !window.webkitAudioContext) return;
-  stopSound(); const Audio=window.AudioContext||window.webkitAudioContext; const audio=new Audio(); audio.resume();
+  if(sound?.audio) { sound.audio.resume().catch(()=>{}); return; }
+  const Audio=window.AudioContext||window.webkitAudioContext; const audio=new Audio();
+  // Create and start the source in the touch gesture itself; iOS may reject later promise callbacks.
   const rainNoise=createNoise(audio), rainFilter=audio.createBiquadFilter(), rainGain=audio.createGain();rainFilter.type='highpass';rainFilter.frequency.value=1900;rainGain.gain.value=.008;rainNoise.connect(rainFilter).connect(rainGain).connect(audio.destination);rainNoise.start();
   sound={audio,rainNoise,rainFilter,rainGain};
+  audio.resume().catch(() => { if(sound?.audio===audio)stopSound(); });
 }
-function updateSound(storm,t) { if(!sound)return; const now=sound.audio.currentTime; const progress=Math.min(1,t/30), intensity=Math.min(1,storm.speed/2); sound.rainGain.gain.setTargetAtTime(.005+progress*.038+intensity*.008,now,.16);sound.rainFilter.frequency.setTargetAtTime(1450+progress*1750,now,.25); }
+function updateSound(storm,t) { if(!sound?.rainGain||!sound?.rainFilter)return; const now=sound.audio.currentTime; const progress=Math.min(1,t/30), intensity=Math.min(1,storm.speed/2); sound.rainGain.gain.setTargetAtTime(.005+progress*.038+intensity*.008,now,.16);sound.rainFilter.frequency.setTargetAtTime(1450+progress*1750,now,.25); }
 function stopSound() { if(!sound)return; const {audio,rainNoise}=sound; const now=audio.currentTime; try { rainNoise.stop(now+.12); } catch {} sound=null; }
 
 function resizeCanvas() { const dpr = devicePixelRatio || 1; canvas.style.width = '100%'; canvas.style.height = '100%'; }
@@ -49,7 +52,7 @@ function windAt(t) {
   const eased = p*p*(3-2*p); // smooth reversal: rain never snaps direction
   return a.value + (b.value-a.value)*eased;
 }
-function reset() { const id=++runId; running=true; gameOver=false; makeWindPattern(); startedAt=performance.now(); last=startedAt; angle=0;targetAngle=0;strain=0;crashAt=0;flash=0; ui.start.classList.add('hidden');ui.result.classList.add('hidden');ui.hud.classList.remove('hidden');requestAnimationFrame(now=>loop(now,id)); try { startSound(); } catch { stopSound(); } }
+function reset() { const id=++runId; running=true; gameOver=false; makeWindPattern(); startedAt=performance.now(); last=startedAt; angle=0;targetAngle=0;strain=0;crashAt=0;flash=0; ui.start.classList.add('hidden');ui.result.classList.add('hidden');ui.hud.classList.remove('hidden'); try { startSound(); } catch { stopSound(); } requestAnimationFrame(now=>loop(now,id)); }
 function end(broken) { running=false; if(!broken)playClearSound(); stopSound(); ui.hud.classList.add('hidden'); ui.result.classList.remove('hidden'); ui.result.classList.toggle('is-clear', !broken); ui.kicker.textContent = broken ? 'GAME OVER' : 'HOME SWEET HOME'; ui.title.textContent = broken ? '傘が壊れました' : '帰宅！'; ui.brokenArt.classList.toggle('hidden', !broken); ui.clearArt.classList.toggle('hidden', broken); const remaining=Math.max(0,30-(performance.now()-startedAt)/1000); ui.message.textContent = broken ? `帰宅まであと ${remaining.toFixed(1)} 秒でした` : '無事帰れたけどずぶ濡れになった。\n傘をさした意味がなかった。'; }
 function drawBackground(t) {
   const g=ctx.createLinearGradient(0,0,0,H);g.addColorStop(0,'#263a57');g.addColorStop(.53,'#48647b');g.addColorStop(1,'#152139');ctx.fillStyle=g;ctx.fillRect(0,0,W,H);
@@ -136,12 +139,16 @@ function loop(now,id) { if(id!==runId || !running)return; const dt=Math.min(.04,
   // Same band is safe. Opposite sides hit the umbrella 2.4× harder than a center-versus-side miss.
   const damageFactor=bandGap===0?0:bandGap===1?1:2.4;
   error=damageFactor;
-  strain=Math.min(100, strain+damageFactor*8*storm.damage*dt); if(strain>=100){gameOver=true;crashAt=now;flash=1;playBreakSound();}}
+  strain=Math.min(100, strain+damageFactor*6.5*storm.damage*dt); if(strain>=100){gameOver=true;crashAt=now;flash=1;playBreakSound();}}
   ctx.clearRect(0,0,W,H);drawBackground(t);drawRain(dt,t);drawPerson(t);if(flash){ctx.fillStyle=`rgba(255,255,255,${flash})`;ctx.fillRect(0,0,W,H);flash-=dt*3;}
   const durability=Math.max(0,Math.round(100-strain)); ui.timer.textContent=Math.max(0,30-t).toFixed(1);ui.arrow.textContent=wind>0?'→→→':'←←←';ui.durability.textContent=`${durability}%`;ui.durabilityBar.style.width=`${durability}%`;ui.hint.textContent=error<.22?'いい感じ！':durability<35?'傘が限界！':'風上へ傘を傾けろ！';
   if(gameOver){if(now-crashAt>1250)end(true);else requestAnimationFrame(next=>loop(next,id));return;} if(arrived){end(false);return;} requestAnimationFrame(next=>loop(next,id)); }
-function pointer(e){const rect=canvas.getBoundingClientRect();const x=(e.touches?e.touches[0].clientX:e.clientX)-rect.left;targetAngle=Math.max(-.9,Math.min(.9,(x/rect.width-.5)*1.8));}
+function pointer(e){startSound();const rect=canvas.getBoundingClientRect();const x=(e.touches?e.touches[0].clientX:e.clientX)-rect.left;targetAngle=Math.max(-.9,Math.min(.9,(x/rect.width-.5)*1.8));}
 canvas.addEventListener('pointerdown',pointer);canvas.addEventListener('pointermove',e=>{if(e.buttons)pointer(e)});canvas.addEventListener('touchstart',pointer,{passive:true});canvas.addEventListener('touchmove',pointer,{passive:true});
+for (const button of [document.querySelector('#startButton'), document.querySelector('#retryButton')]) {
+  button.addEventListener('pointerdown', startSound, { passive: true });
+  button.addEventListener('touchstart', startSound, { passive: true });
+}
 document.querySelector('#startButton').addEventListener('click',reset);document.querySelector('#retryButton').addEventListener('click',reset);document.querySelector('#homeButton').addEventListener('click',()=>{ui.result.classList.add('hidden');ui.start.classList.remove('hidden');});
 // Redraw the start screen after the character illustration has loaded.
 function drawAttract() { ctx.clearRect(0,0,W,H);drawBackground(0);drawRain(.5,0);drawPerson(0); }
