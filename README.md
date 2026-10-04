@@ -186,3 +186,7 @@ npm run deploy
 
 - `aca3356` — Initial typhoon umbrella game
 - `7c0dfbe` — Deploy game with Cloudflare Workers assets
+
+## ライセンス
+
+[MIT License](./LICENSE)（Copyright (c) 2026 chozo）です。改変・再配布・商用利用ができます。利用するときは、著作権表示とライセンス文を残してください。

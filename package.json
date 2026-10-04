@@ -1,6 +1,7 @@
 {
   "name": "typhoon-umbrella",
   "version": "1.0.0",
+  "license": "MIT",
   "private": true,
   "scripts": {
     "build": "node tools/build-dist.mjs",
