@@ -88,8 +88,10 @@ GitHub: <https://github.com/chozo/typhoon-umbrella>
 | `character-back-deformed.png` | プレイ中の後ろ姿の人物イラスト |
 | `broken-umbrella.png` | ゲームオーバー用の壊れた傘イラスト |
 | `soaked-character.png` | クリア画面用のずぶ濡れ人物イラスト |
-| `favicon.svg` | 透明背景・赤い傘・黒い骨組みのファビコン |
-| `tools/build-dist.mjs` | 公開用の `dist/typhoon-umbrella/` を生成するスクリプト |
+| `public/favicon.svg` | 透明背景・赤い傘・黒い骨組みのファビコン |
+| `public/ogp.png` | SNS共有用のOGP画像（1200×630） |
+| `tools/build-dist.mjs` | 公開用の `dist/typhoon-umbrella/` を生成するスクリプト（`public/` の中身は直下にコピー） |
+| `tools/ogp/make-ogp.mjs` | OGP画像を作るスクリプト（`npm run ogp`） |
 | `wrangler.jsonc` | Cloudflare Workers + Static Assetsの設定 |
 
 ## ローカルで遊ぶ
@@ -111,9 +113,22 @@ npm run build
 npm run deploy
 ```
 
-`npm run build` は公開対象の7ファイルを `dist/typhoon-umbrella/` に出力します。
+`npm run build` は `dist/` を空にしてから、公開対象のファイルを `dist/typhoon-umbrella/` に出力します。`public/` の `favicon.svg` と `ogp.png` は公開ルート直下に置かれ、`https://game.chozo.net/typhoon-umbrella/favicon.svg` と `https://game.chozo.net/typhoon-umbrella/ogp.png` で取得できます。
 
 `npm run deploy` はビルド後、Cloudflare Workers + Static Assetsへデプロイします。
+
+### OGP画像
+
+```bash
+npm run ogp
+```
+
+`public/ogp.png`（1200×630）を作り直します。playwright-core とインストール済みの Chrome（ヘッドレス）を使います。
+
+1. ゲームを縦長の画面で開き、時計と乱数を固定して1コマずつ進めます。毎コマ、雨の向きに合わせて画面をドラッグし、傘を風上へ傾けたまま 21.5 秒目（嵐が強い段階）を撮ります。毎回同じ風になります。
+2. 1200×630 の台紙に、撮った画面・タイトル・遊び方・URL・赤い傘を並べて撮ります。台紙の文字は Google Fonts の Zen Kaku Gothic New を使うので、ネットワークに接続して実行します。
+
+`index.html` には `og:*` と `twitter:card` のメタタグがあり、画像とページは絶対URL（`https://game.chozo.net/typhoon-umbrella/`）を指します。
 
 ### Cloudflare設定
 
